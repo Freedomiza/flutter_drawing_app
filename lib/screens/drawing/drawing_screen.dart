@@ -1,7 +1,13 @@
 import 'package:drawer_app/generated/l10n.dart';
-import 'package:flutter/material.dart';
+import 'package:drawer_app/resources/draw_const.dart';
 
-class DrawingScreen extends StatelessWidget {
+import 'package:drawer_app/screens/drawing/providers/frame_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import './widgets/painter/drawing_tool.dart';
+
+class DrawingScreen extends ConsumerStatefulWidget {
   static String routeName = 'drawing';
 
   static String routeUrl = '/drawing';
@@ -9,12 +15,34 @@ class DrawingScreen extends StatelessWidget {
   const DrawingScreen({Key? key}) : super(key: key);
 
   @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _DrawingScreenState();
+}
+
+class _DrawingScreenState extends ConsumerState<DrawingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      ref.read(frameProvider.notifier).setOrientation(DrawOrientation.vertical);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(frameProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).DRAWING_SCREEN),
       ),
-      body: Container(),
+      body: Container(
+        // color: Colors.amber,
+        child: provider.isZero
+            ? const SizedBox.shrink()
+            : DrawingTool(
+                frame: provider,
+              ),
+      ),
     );
   }
 }

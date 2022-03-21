@@ -1,13 +1,10 @@
 import 'package:drawer_app/resources/draw_const.dart';
-import 'package:drawer_app/screens/drawing/widgets/painter/painter_controller.dart';
+import 'package:drawer_app/screens/drawing/providers/painter_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'canvas_painter.dart';
 import 'matrix_gesture_detector.dart';
-
-final painterProvider = Provider<PainterController>((ref) {
-  return PainterController();
-});
 
 class DrawingTool extends ConsumerStatefulWidget {
   final BaseFrame frame;
@@ -19,7 +16,8 @@ class DrawingTool extends ConsumerStatefulWidget {
 }
 
 class _DrawingToolState extends ConsumerState<DrawingTool> {
-  PainterController get painterController => ref.read(painterProvider);
+  final GlobalKey _globalKey = GlobalKey();
+  PainterController get painterController => ref.watch(painterProvider);
   @override
   void initState() {
     super.initState();
@@ -31,8 +29,6 @@ class _DrawingToolState extends ConsumerState<DrawingTool> {
           );
     });
   }
-
-  final GlobalKey _globalKey = GlobalKey();
 
   void _onPanStart(DragStartDetails start) {
     Offset pos = (context.findRenderObject() as RenderBox)
@@ -77,9 +73,11 @@ class _DrawingToolState extends ConsumerState<DrawingTool> {
   @override
   Widget build(BuildContext context) {
     // Update widget based on props
+
     final zoomMode = painterController.zoomMode;
     final matrix = painterController.matrix;
 
+    if (!painterController.isReady) return Container();
     return SizedBox.expand(
       child: MatrixGestureDetector(
           onMatrixUpdate: _handleMatrixUpdate,
@@ -87,24 +85,23 @@ class _DrawingToolState extends ConsumerState<DrawingTool> {
           onPanStart: _onPanStart,
           onPanUpdate: _onPanUpdate,
           onPanEnd: _onPanEnd,
-          child: Stack(children: [
-            Container(
-              width: widget.frame.width,
-              height: widget.frame.height,
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 1)),
-              transform: matrix != Matrix4.zero() ? matrix : null,
-              child: RepaintBoundary(
-                key: _globalKey,
-                child: CustomPaint(
-                  size: Size(widget.frame.width, widget.frame.height),
-                  willChange: true,
-                  painter: CanvasPainter(painterController.pathHistory,
-                      repaint: painterController),
-                ),
-              ),
-            ),
-          ])),
+          child: Stack(
+            children: [
+              Container(
+                  width: widget.frame.width,
+                  height: widget.frame.height,
+                  transform: matrix != Matrix4.zero() ? matrix : null,
+                  child: RepaintBoundary(
+                    key: _globalKey,
+                    child: CustomPaint(
+                      size: Size(widget.frame.width, widget.frame.height),
+                      willChange: true,
+                      painter: CanvasPainter(painterController.pathHistory,
+                          repaint: painterController),
+                    ),
+                  )),
+            ],
+          )),
     );
   }
 }

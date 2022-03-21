@@ -1,4 +1,5 @@
 import 'package:drawer_app/screens/drawing/drawing_screen.dart';
+import 'package:drawer_app/utils/size_config.dart';
 import 'package:drawer_app/widgets/buttons/button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +17,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // final counter = ref.watch(counterProvider);
     // final counterNotifier = ref.read(counterProvider.notifier);
-
+    SizeConfig.init(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).APP_NAME),

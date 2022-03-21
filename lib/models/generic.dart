@@ -42,6 +42,13 @@ class TextStyleModel {
 class BackgroundModel {
   String? color;
   String? image;
+  BackgroundModel({
+    this.color,
+    this.image,
+  });
+  factory BackgroundModel.fromJson(Map<String, dynamic> json) =>
+      _$BackgroundModelFromJson(json);
+  Map<String, dynamic> toJson() => _$BackgroundModelToJson(this);
 }
 
 @JsonSerializable(ignoreUnannotated: true)

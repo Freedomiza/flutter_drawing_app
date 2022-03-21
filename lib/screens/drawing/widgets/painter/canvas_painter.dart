@@ -10,7 +10,6 @@ class CanvasPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // print(size);
     _path.draw(canvas, size);
   }
 

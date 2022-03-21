@@ -23,9 +23,10 @@ Map<String, dynamic> _$TextStyleModelToJson(TextStyleModel instance) =>
     };
 
 BackgroundModel _$BackgroundModelFromJson(Map<String, dynamic> json) =>
-    BackgroundModel()
-      ..color = json['color'] as String?
-      ..image = json['image'] as String?;
+    BackgroundModel(
+      color: json['color'] as String?,
+      image: json['image'] as String?,
+    );
 
 Map<String, dynamic> _$BackgroundModelToJson(BackgroundModel instance) =>
     <String, dynamic>{

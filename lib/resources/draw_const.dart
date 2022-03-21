@@ -1,6 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
+
+import 'dart:ui';
 
 const double MAX_FRAMES = 4;
 
@@ -24,35 +26,33 @@ abstract class BaseFrame {
     this.width = 0,
     this.height = 0,
   });
+
+  bool get isZero => width == 0 || height == 0;
   @override
   String toString() => 'BaseFrame(width: $width, height: $height)';
+
+  void initFrame(Size size) {
+    width = size.width;
+    height = size.height;
+  }
 }
 
 class HorizontalFrame extends BaseFrame {
-  HorizontalFrame(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    this.width = width;
-    height = width / 2;
-  }
-  HorizontalFrame.fromScreenWidth(double width) {
-    this.width = width;
-    height = width / 2;
-    // print(this.toString());
+  HorizontalFrame(double width, double height)
+      : super(width: width, height: height);
+
+  factory HorizontalFrame.fromScreenWidth(Size size) {
+    var width = size.width;
+    return HorizontalFrame(width, width / 2);
   }
 }
 
 class VerticalFrame extends BaseFrame {
-  VerticalFrame(BuildContext context) {
-    var height = MediaQuery.of(context).size.height * 0.7;
-    // var width = MediaQuery.of(context).size.width;
+  VerticalFrame(double width, double height)
+      : super(width: width, height: height);
 
-    width = height / 2;
-    this.height = height;
-  }
-
-  VerticalFrame.fromScreenHeight(double height) {
-    this.height = (height) * 0.7;
-    width = ((height) * 0.7) / 2;
-    // print(this.toString());
+  factory VerticalFrame.fromScreenHeight(Size size) {
+    final baseHeight = size.height * .7;
+    return VerticalFrame(baseHeight / 2, baseHeight);
   }
 }
