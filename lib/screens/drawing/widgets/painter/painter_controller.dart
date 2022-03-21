@@ -1,51 +1,39 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-// import 'package:canvas_drawing/constants/draw_const.dart';
-import 'package:canvas_drawing/models/story/action_type_model.dart';
-import 'package:canvas_drawing/models/story/history_model.dart';
-import 'package:canvas_drawing/screens/drawing_tools/helper.dart';
+import 'package:drawer_app/models/action_type.dart';
+import 'package:drawer_app/models/history.dart';
+import 'package:drawer_app/utils/size_config.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart' hide Image;
 import 'package:flutter/material.dart' as mat show Image;
 import 'package:flutter/rendering.dart';
-import 'package:property_change_notifier/property_change_notifier.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
-final INITIAL_PAINT = new Paint()
-  ..color = Colors.black
-  ..strokeWidth = 1
-  ..isAntiAlias = true
-  ..style = PaintingStyle.stroke;
-
-final Paint SELECTED_PAINT = new Paint()
-  ..color = Colors.blue
-  ..strokeWidth = 1
-  ..isAntiAlias = true
-  ..style = PaintingStyle.stroke;
-
-class PainterController extends PropertyChangeNotifier<String> {
-  Color _drawColor = Color.fromARGB(255, 0, 0, 0);
-  Color _backgroundColor = Color.fromARGB(255, 255, 255, 255);
-  mat.Image _bgimage;
+class PainterController extends ChangeNotifier {
+  Color _drawColor = const Color.fromARGB(255, 0, 0, 0);
+  Color _backgroundColor = const Color.fromARGB(255, 255, 255, 255);
+  mat.Image? _bgimage;
   double _thickness = 3.0;
   double _erasethickness = 3.0;
   double _opacity = 1;
 
-  HistoryModel _pathHistory;
-  HistoryModel get pathHistory => _pathHistory;
-  set pathHistory(value) {
-    _pathHistory = value;
-  }
+  HistoryModel pathHistory = HistoryModel(
+    actionList: [],
+    redoList: [],
+    color: 'FFF',
+    opacity: 1,
+    paint: INITIAL_PAINT,
+    selectedPaint: SELECTED_PAINT,
+  );
 
-  ActionTypeModel get mode => _pathHistory.mode;
-  set mode(ActionTypeModel value) {
-    _pathHistory.mode = value;
+  ActionTypeModel get mode => pathHistory.mode;
+  void changeMode(ActionTypeModel value) {
+    pathHistory.mode = value;
     _updatePaint();
   }
 
   Matrix4 _matrix = Matrix4.zero();
 
-  Matrix4 getMatrix() => _matrix;
+  Matrix4 get matrix => _matrix;
   void setMatrix(Matrix4 val) {
     _matrix = val;
     _updatePaint();
@@ -53,9 +41,9 @@ class PainterController extends PropertyChangeNotifier<String> {
 
   bool _zoomMode = false;
   bool get zoomMode => _zoomMode;
-  set zoomMode(bool value) {
+  void setZoomMode(bool value) {
     _zoomMode = value;
-    notifyListeners("zoomMode");
+    notifyListeners();
     _updatePaint();
   }
 
@@ -65,27 +53,19 @@ class PainterController extends PropertyChangeNotifier<String> {
     _selectMode = value;
 
     pathHistory.selectMode = value;
-    notifyListeners("selectMode");
+    notifyListeners();
     _updatePaint();
   }
 
-  GlobalKey _globalKey;
-  set globalKey(GlobalKey key) {
-    _globalKey = key;
-  }
+  GlobalKey? globalKey;
 
-  PainterController(double frameWidth, double frameHeight) {
-    _pathHistory = HistoryModel(
-      actionList: [],
-      redoList: [],
-      color: 'FFF',
-      opacity: 1,
-      paint: INITIAL_PAINT,
-      selectedPaint: SELECTED_PAINT,
-    );
-
-    this.setMatrix(
-        DrawerHelper.getCenterTranformMatrix(frameWidth, frameHeight));
+  void initPainter(
+      {required GlobalKey globalKey,
+      required double frameWidth,
+      required double frameHeight,
+      Image? bgImage}) {
+    this.globalKey = globalKey;
+    setMatrix(_getCenterTranformMatrix(frameWidth, frameHeight));
   }
 
   Color get drawColor => _drawColor;
@@ -100,8 +80,8 @@ class PainterController extends PropertyChangeNotifier<String> {
     _updatePaint();
   }
 
-  mat.Image get backgroundImage => _bgimage;
-  set backgroundImage(mat.Image image) {
+  mat.Image? get backgroundImage => _bgimage;
+  set backgroundImage(mat.Image? image) {
     _bgimage = image;
     _updatePaint();
   }
@@ -115,14 +95,14 @@ class PainterController extends PropertyChangeNotifier<String> {
   double get erasethickness => _erasethickness;
   set erasethickness(double t) {
     _erasethickness = t;
-    _pathHistory.eraseArea = t;
+    pathHistory.eraseArea = t;
     _updatePaint();
   }
 
-  bool get eraser => _pathHistory.eraseMode; //setter / getter for eraser
+  bool get eraser => pathHistory.eraseMode; //setter / getter for eraser
   set eraser(bool e) {
-    _pathHistory.eraseMode = e;
-    _pathHistory.eraseArea = _erasethickness;
+    pathHistory.eraseMode = e;
+    pathHistory.eraseArea = _erasethickness;
     _updatePaint();
   }
 
@@ -146,19 +126,19 @@ class PainterController extends PropertyChangeNotifier<String> {
 
   bool dragMode = false;
 
-  Offset get dragStart => pathHistory.dragStart;
-  set dragStart(Offset value) {
+  Offset? get dragStart => pathHistory.dragStart;
+  set dragStart(Offset? value) {
     pathHistory.dragStart = _mapToCurrentView(value);
   }
 
-  Offset get dragEnd => pathHistory.dragEnd;
-  set dragEnd(Offset value) {
+  Offset? get dragEnd => pathHistory.dragEnd;
+  set dragEnd(Offset? value) {
     pathHistory.dragEnd = _mapToCurrentView(value);
   }
 
   /// Check can undo / redo flag
-  bool get canUndo => _pathHistory.canUndo();
-  bool get canRedo => _pathHistory.canRedo();
+  bool get canUndo => pathHistory.canUndo;
+  bool get canRedo => pathHistory.canRedo;
 
   void _updatePaint() {
     Paint paint = Paint();
@@ -167,86 +147,87 @@ class PainterController extends PropertyChangeNotifier<String> {
     paint.style = PaintingStyle.stroke;
 
     paint.strokeWidth = thickness;
-    _pathHistory.opacity = _opacity;
-    _pathHistory.paint = paint;
-    _pathHistory.gridVisible = _gridMode;
-    _pathHistory.matrix = _matrix;
+    pathHistory.opacity = _opacity;
+    pathHistory.paint = paint;
+    pathHistory.gridVisible = _gridMode;
+    pathHistory.matrix = _matrix;
     if (_bgimage != null) {
-      _pathHistory.backgroundColor = Color(0x00000000);
+      pathHistory.backgroundColor = const Color(0x00000000);
     } else {
-      _pathHistory.backgroundColor = _backgroundColor;
+      pathHistory.backgroundColor = _backgroundColor;
     }
     notifyListeners();
   }
 
   void undo() {
-    _pathHistory.undo();
+    pathHistory.undo();
     notifyListeners();
   }
 
   void redo() {
-    _pathHistory.redo();
+    pathHistory.redo();
     notifyListeners();
   }
 
   void toggleGrid(bool gridVisible) {
-    _pathHistory.gridVisible = gridVisible;
-    notifyListeners();
-  }
-
-  void notify() {
+    pathHistory.gridVisible = gridVisible;
     notifyListeners();
   }
 
   void clear() {
-    _pathHistory.clear();
+    pathHistory.clear();
     notifyListeners();
   }
 
   void addText(String text) {
-    _pathHistory.addText(text);
+    pathHistory.addText(text);
   }
 
   Future<Uint8List> exportAsPNGBytes() async {
-    RenderRepaintBoundary boundary =
-        _globalKey.currentContext.findRenderObject();
+    var result = Uint8List(0);
+    final boundary =
+        globalKey?.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary == null) return result;
+
     ui.Image image = await boundary.toImage();
-    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    return byteData.buffer.asUint8List();
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    result = byteData?.buffer.asUint8List() ?? Uint8List(0);
+
+    return result;
   }
 
   void add(Offset pos) {
     pathHistory.add(
       _mapToCurrentView(pos),
     );
-    this.notify();
+    notifyListeners();
   }
 
   void update(Offset pos) {
     pathHistory.updateCurrent(_mapToCurrentView(pos));
-    this.notify();
+    notifyListeners();
   }
 
   void end() {
     pathHistory.endCurrent();
-    this.notify();
+    notifyListeners();
   }
 
   void addSelectPoint(Offset pos) {
     pathHistory.selectEnd = null;
     pathHistory.selectStart = _mapToCurrentView(pos);
-    this.notify();
+    notifyListeners();
   }
 
   void updateSelectPoint(Offset pos) {
     pathHistory.selectEnd = _mapToCurrentView(pos);
-    this.notify();
+    notifyListeners();
   }
 
   void calculateSelect() {
     pathHistory.calculateSelect();
     _updatePaint();
-    this.notify();
+    notifyListeners();
   }
 
   void clearSelectPoint() {
@@ -256,21 +237,22 @@ class PainterController extends PropertyChangeNotifier<String> {
     pathHistory.dragEnd = null;
   }
 
-  Offset _mapToCurrentView(Offset pos) {
-    Vector3 newPos = new Vector3(pos.dx, pos.dy, 0);
+  Offset _mapToCurrentView(Offset? pos) {
+    if (pos == null) return Offset.zero;
+    Vector3 newPos = Vector3(pos.dx, pos.dy, 0);
 
-    if (_matrix != null && _matrix != Matrix4.zero()) {
-      var m = new Matrix4.zero();
+    if (_matrix != Matrix4.zero()) {
+      var m = Matrix4.zero();
       m.copyInverse(_matrix);
       newPos.applyMatrix4(m);
     }
-    return new Offset(newPos.x, newPos.y);
+    return Offset(newPos.x, newPos.y);
   }
 
   void resetMode() {
     eraser = false;
     selectMode = false;
-    mode = ActionTypeModel.Path;
+    changeMode(ActionTypeModel.Path);
   }
 
   bool hitTestSelectedPath(Offset pos) {
@@ -285,30 +267,35 @@ class PainterController extends PropertyChangeNotifier<String> {
   }
 
   void onPanUpdate(ui.Offset pos) {
-    if (this.selectMode) {
+    if (selectMode) {
       // User is moving the selecting path
-      if (this.dragMode && this.dragStart != null) {
-        if (this.dragStart == null) {
-          this.dragStart = pos;
-        }
-        this.dragEnd = pos;
+      if (dragMode) {
+        dragStart ??= pos;
+        dragEnd = pos;
         // This will counted as dragging selecting path
-        this.dragSelecting(pos);
+        dragSelecting(pos);
       } else {
-        this.updateSelectPoint(pos);
-        this.calculateSelect();
+        updateSelectPoint(pos);
+        calculateSelect();
       }
     } else {
-      this.update(pos);
+      update(pos);
     }
   }
 
   void onPanEnd(DragEndDetails end) {
-    if (this.selectMode) {
-      this.calculateSelect();
-      this.clearSelectPoint();
+    if (selectMode) {
+      calculateSelect();
+      clearSelectPoint();
     } else {
       this.end();
     }
+  }
+
+  static _getCenterTranformMatrix(double width, double height) {
+    return Transform.translate(
+            offset: Offset((SizeConfig.screenWidth - width) / 2,
+                (SizeConfig.screenHeight - height) / 2))
+        .transform;
   }
 }

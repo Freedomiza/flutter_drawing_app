@@ -1,9 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
-
 import 'package:drawer_app/extension/hex_color.dart';
 import 'package:drawer_app/models/draw_action.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 

@@ -1,35 +1,44 @@
 import 'package:drawer_app/resources/draw_const.dart';
+import 'package:drawer_app/screens/drawing/widgets/painter/painter_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'canvas_painter.dart';
 import 'matrix_gesture_detector.dart';
 
-class DrawingTool extends StatefulWidget {
-  final PainterController painterController;
+final painterProvider = Provider<PainterController>((ref) {
+  return PainterController();
+});
+
+class DrawingTool extends ConsumerStatefulWidget {
   final BaseFrame frame;
 
-  DrawingTool(PainterController painterController, this.frame)
-      : this.painterController = painterController,
-        super(key: ValueKey<PainterController>(painterController));
+  const DrawingTool({Key? key, required this.frame}) : super(key: key);
+
   @override
-  _DrawingToolState createState() => _DrawingToolState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _DrawingToolState();
 }
 
-class _DrawingToolState extends State<DrawingTool> {
-  final GlobalKey _globalKey = GlobalKey();
-
+class _DrawingToolState extends ConsumerState<DrawingTool> {
+  PainterController get painterController => ref.read(painterProvider);
   @override
   void initState() {
     super.initState();
-    widget.painterController.globalKey = _globalKey;
-    // if (widget.history != null) {
-    //   widget.painterController.pathHistory = widget.history;
-    // }
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      ref.read(painterProvider).initPainter(
+            globalKey: _globalKey,
+            frameWidth: widget.frame.width,
+            frameHeight: widget.frame.height,
+          );
+    });
   }
+
+  final GlobalKey _globalKey = GlobalKey();
 
   void _onPanStart(DragStartDetails start) {
     Offset pos = (context.findRenderObject() as RenderBox)
         .globalToLocal(start.globalPosition);
-    final controller = widget.painterController;
+    final controller = ref.read(painterProvider);
+
     if (controller.selectMode) {
       if (controller.selectingCount > 0 &&
           controller.hitTestSelectedPath(pos)) {
@@ -44,25 +53,21 @@ class _DrawingToolState extends State<DrawingTool> {
   }
 
   void _onPanUpdate(DragUpdateDetails update) {
-    final controller = widget.painterController;
-
     // Translate current point to new offset
     Offset pos = (context.findRenderObject() as RenderBox)
         .globalToLocal(update.globalPosition);
 
-    controller.onPanUpdate(pos);
+    painterController.onPanUpdate(pos);
   }
 
   _onPanEnd(DragEndDetails end) {
-    final controller = widget.painterController;
-    controller.onPanEnd(end);
+    painterController.onPanEnd(end);
   }
 
   _handleMatrixUpdate(m, tm, sm, rm) {
-    final controller = widget.painterController;
-    if (controller.zoomMode) {
+    if (painterController.zoomMode) {
       setState(() {
-        controller.setMatrix(m);
+        painterController.setMatrix(m);
       });
       return true;
     }
@@ -72,10 +77,8 @@ class _DrawingToolState extends State<DrawingTool> {
   @override
   Widget build(BuildContext context) {
     // Update widget based on props
-    final zoomMode = PropertyChangeProvider.of<PainterController>(context,
-        properties: ['zoomMode']).value.zoomMode;
-    final matrix = PropertyChangeProvider.of<PainterController>(context,
-        properties: ['matrix']).value.getMatrix();
+    final zoomMode = painterController.zoomMode;
+    final matrix = painterController.matrix;
 
     return SizedBox.expand(
       child: MatrixGestureDetector(
@@ -90,15 +93,14 @@ class _DrawingToolState extends State<DrawingTool> {
               height: widget.frame.height,
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 1)),
-              transform:
-                  matrix != null && matrix != Matrix4.zero() ? matrix : null,
+              transform: matrix != Matrix4.zero() ? matrix : null,
               child: RepaintBoundary(
                 key: _globalKey,
                 child: CustomPaint(
                   size: Size(widget.frame.width, widget.frame.height),
                   willChange: true,
-                  painter: CanvasPainter(widget.painterController.pathHistory,
-                      repaint: widget.painterController),
+                  painter: CanvasPainter(painterController.pathHistory,
+                      repaint: painterController),
                 ),
               ),
             ),

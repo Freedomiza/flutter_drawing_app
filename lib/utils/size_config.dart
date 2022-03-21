@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Adapt {
-  static Adapt? _instance;
+class SizeConfig {
+  static SizeConfig? _instance;
 
   /// UI设计中手机尺寸 , px
   /// Size of the phone in UI Design , px
@@ -30,14 +30,14 @@ class Adapt {
     uiHeightPx = size;
   }
 
-  Adapt._();
+  SizeConfig._();
 
-  factory Adapt() {
-    return _instance ??= Adapt._();
+  factory SizeConfig() {
+    return _instance ??= SizeConfig._();
   }
 
   static void init(BuildContext context) {
-    _instance ??= Adapt._();
+    _instance ??= SizeConfig._();
 
     MediaQueryData mediaQuery = MediaQuery.of(context);
     _mediaQueryData = mediaQuery;

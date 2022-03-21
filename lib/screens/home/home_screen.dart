@@ -6,8 +6,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:drawer_app/generated/l10n.dart';
 
-import 'home_provider.dart';
-
 class HomeScreen extends ConsumerWidget {
   static String routeName = 'home';
   static String routeUrl = '/home';
@@ -16,8 +14,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final counter = ref.watch(counterProvider);
-    final counterNotifier = ref.read(counterProvider.notifier);
+    // final counter = ref.watch(counterProvider);
+    // final counterNotifier = ref.read(counterProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(

@@ -9,7 +9,9 @@ part 'draw_action.g.dart';
 
 @JsonSerializable(ignoreUnannotated: true)
 class DrawActionModel {
+  @JsonKey(ignore: true)
   Paint? paint;
+  @JsonKey(ignore: true)
   Paint? selectedPaint;
 
   @JsonKey(name: 'boundDistance')
@@ -29,14 +31,15 @@ class DrawActionModel {
       _$DrawActionModelFromJson(json);
   Map<String, dynamic> toJson() => _$DrawActionModelToJson(this);
 
-  DrawActionModel(
-      {this.paint,
-      this.selectedPaint,
-      required this.actionType,
-      required this.opacity,
-      this.points = const [],
-      this.isSelected = false,
-      this.zIndex = 0});
+  DrawActionModel({
+    this.actionType = ActionTypeModel.Hand,
+    this.opacity = 1,
+    this.paint,
+    this.selectedPaint,
+    this.points = const [],
+    this.isSelected = false,
+    this.zIndex = 0,
+  });
 
   Rect get boundingBox {
     final firstPoint = points.first;
@@ -52,7 +55,8 @@ class DrawActionModel {
     return boundingRect;
   }
 
-  Paint get drawPaint => isSelected == true ? selectedPaint : paint;
+  Paint get drawPaint =>
+      isSelected == true ? (selectedPaint ?? Paint()) : (paint ?? Paint());
 
   Paint get boundingBoxPaint => Paint()
     ..color = Colors.blue.withOpacity(0.5)
@@ -123,9 +127,9 @@ class TextActionModel extends DrawActionModel {
   TextActionModel({
     required this.text,
     required this.style,
-    required Paint paint,
-    required Paint selectedPaint,
-    required double opacity,
+    Paint? paint,
+    Paint? selectedPaint,
+    double opacity = 1,
     ActionTypeModel actionType = ActionTypeModel.Text,
     bool isSelected = false,
     List<PointModel> points = const [],
@@ -171,14 +175,15 @@ class TextActionModel extends DrawActionModel {
 
   factory TextActionModel.fromJson(Map<String, dynamic> json) =>
       _$TextActionModelFromJson(json);
+  @override
   Map<String, dynamic> toJson() => _$TextActionModelToJson(this);
 }
 
 @JsonSerializable(ignoreUnannotated: true)
 class LineActionModel extends DrawActionModel {
   LineActionModel({
-    required Paint paint,
-    required Paint selectedPaint,
+    Paint? paint,
+    Paint? selectedPaint,
     required ActionTypeModel actionType,
     required double opacity,
     List<PointModel> points = const [],
@@ -214,6 +219,7 @@ class LineActionModel extends DrawActionModel {
 
   factory LineActionModel.fromJson(Map<String, dynamic> json) =>
       _$LineActionModelFromJson(json);
+  @override
   Map<String, dynamic> toJson() => _$LineActionModelToJson(this);
 }
 
@@ -221,16 +227,16 @@ class LineActionModel extends DrawActionModel {
 class PathActionModel extends DrawActionModel {
   late Path path;
 
-  PathActionModel(
-      {required Paint paint,
-      required Paint selectedPaint,
-      ActionTypeModel actionType = ActionTypeModel.Path,
-      double opacity = 1,
-      bool isSelected = false,
-      List<PointModel> points = const [],
-      int zIndex = 0,
-      Path? path})
-      : super(
+  PathActionModel({
+    Paint? paint,
+    Paint? selectedPaint,
+    ActionTypeModel actionType = ActionTypeModel.Path,
+    double opacity = 1,
+    bool isSelected = false,
+    List<PointModel> points = const [],
+    int zIndex = 0,
+    Path? path,
+  }) : super(
             actionType: actionType,
             isSelected: isSelected,
             opacity: opacity,
@@ -290,26 +296,31 @@ class PathActionModel extends DrawActionModel {
 
   factory PathActionModel.fromJson(Map<String, dynamic> json) =>
       _$PathActionModelFromJson(json);
+  @override
   Map<String, dynamic> toJson() => _$PathActionModelToJson(this);
 }
 
 @JsonSerializable(ignoreUnannotated: true)
 class ShapeActionModel extends DrawActionModel {
+  @JsonKey()
   ShapeModel shape;
+  @JsonKey()
   BackgroundModel? background;
+
   late Path path;
-  ShapeActionModel(
-      {required Paint paint,
-      required List<PointModel> points,
-      required this.shape,
-      required Paint selectedPaint,
-      required double opacity,
-      this.background,
-      ActionTypeModel actionType = ActionTypeModel.Shape,
-      bool isSelected = false,
-      Path? path,
-      int zIndex = 0})
-      : super(
+
+  ShapeActionModel({
+    Paint? paint,
+    Paint? selectedPaint,
+    List<PointModel> points = const [],
+    required this.shape,
+    double opacity = 1,
+    this.background,
+    ActionTypeModel actionType = ActionTypeModel.Shape,
+    bool isSelected = false,
+    Path? path,
+    int zIndex = 0,
+  }) : super(
           actionType: actionType,
           isSelected: isSelected,
           opacity: opacity,
