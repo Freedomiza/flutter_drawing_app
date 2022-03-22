@@ -30,6 +30,11 @@ class PainterController extends ChangeNotifier {
     selectedPaint: SELECTED_PAINT,
   );
 
+  void setPathHistory(HistoryModel historyModel) {
+    pathHistory = historyModel;
+    notifyListeners();
+  }
+
   ActionTypeModel get mode => pathHistory.mode;
   void changeMode(ActionTypeModel value) {
     pathHistory.mode = value;

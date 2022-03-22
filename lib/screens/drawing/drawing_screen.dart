@@ -2,6 +2,8 @@ import 'package:drawer_app/generated/l10n.dart';
 import 'package:drawer_app/resources/draw_const.dart';
 
 import 'package:drawer_app/screens/drawing/providers/frame_provider.dart';
+import 'package:drawer_app/screens/drawing/widgets/footer_bar/drawing_footer_bar.dart';
+import 'package:drawer_app/screens/drawing/widgets/header_bar/drawing_header_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -9,9 +11,7 @@ import './widgets/painter/drawing_tool.dart';
 
 class DrawingScreen extends ConsumerStatefulWidget {
   static String routeName = 'drawing';
-
   static String routeUrl = '/drawing';
-
   const DrawingScreen({Key? key}) : super(key: key);
 
   @override
@@ -35,13 +35,18 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
       appBar: AppBar(
         title: Text(S.of(context).DRAWING_SCREEN),
       ),
-      body: Container(
-        // color: Colors.amber,
-        child: provider.isZero
-            ? const SizedBox.shrink()
-            : DrawingTool(
-                frame: provider,
-              ),
+      body: Stack(
+        children: [
+          Container(
+            child: provider.isZero
+                ? const SizedBox.shrink()
+                : DrawingTool(
+                    frame: provider,
+                  ),
+          ),
+          const DrawingHeaderBar(),
+          const DrawingFooterBar()
+        ],
       ),
     );
   }
