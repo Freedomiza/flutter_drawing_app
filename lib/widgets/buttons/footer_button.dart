@@ -7,9 +7,10 @@ class FooterButton extends StatelessWidget {
     required this.color,
     required this.icon,
     required this.onPress,
+    this.size = 32.0,
     this.onLongPress,
   }) : super(key: key);
-
+  final double size;
   final String tooltips;
   final Color color;
   final Icon icon;
@@ -18,21 +19,16 @@ class FooterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      key: Key(tooltips),
-      borderRadius: BorderRadius.circular(12),
-      child: Material(
-        color: color,
-        child: InkWell(
-          child: SizedBox(
-            child: icon,
-            width: 40,
-            height: 40,
-          ),
-          onTap: onPress,
-          onLongPress: onLongPress,
-        ),
-      ),
+    return TextButton(
+      onPressed: onPress,
+      style: ButtonStyle(
+          padding: MaterialStateProperty.all(const EdgeInsets.all(0)),
+          maximumSize: MaterialStateProperty.all(Size(size, size)),
+          minimumSize: MaterialStateProperty.all(Size(size, size)),
+          backgroundColor: MaterialStateProperty.all(color),
+          shape: MaterialStateProperty.all<CircleBorder>(
+              CircleBorder(side: BorderSide(color: color)))),
+      child: icon,
     );
   }
 }

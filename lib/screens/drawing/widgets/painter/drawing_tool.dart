@@ -1,4 +1,5 @@
 import 'package:drawer_app/resources/draw_const.dart';
+import 'package:drawer_app/resources/styles.dart';
 import 'package:drawer_app/screens/drawing/providers/painter_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -88,8 +89,7 @@ class _DrawingToolState extends ConsumerState<DrawingTool> {
           child: Stack(
             children: [
               Container(
-                  width: widget.frame.width,
-                  height: widget.frame.height,
+                  color: Styles.greyColor,
                   transform: matrix != Matrix4.zero() ? matrix : null,
                   child: RepaintBoundary(
                     key: _globalKey,

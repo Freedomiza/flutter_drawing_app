@@ -1,4 +1,5 @@
 import 'package:drawer_app/resources/draw_const.dart';
+import 'package:drawer_app/resources/styles.dart';
 import 'package:drawer_app/screens/drawing/providers/frame_provider.dart';
 import 'package:drawer_app/screens/drawing/widgets/footer_bar/drawing_footer_bar.dart';
 import 'package:drawer_app/screens/drawing/widgets/header_bar/drawing_header_bar.dart';
@@ -33,6 +34,7 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
       body: Stack(
         children: [
           Container(
+            color: Styles.greyColor.withOpacity(.66),
             child: provider.isZero
                 ? const SizedBox.shrink()
                 : DrawingTool(

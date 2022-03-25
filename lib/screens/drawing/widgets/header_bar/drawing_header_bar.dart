@@ -134,64 +134,70 @@ class _DrawingHeaderBarState extends ConsumerState<DrawingHeaderBar> {
         width: _expanded ? MediaQuery.of(context).size.width * 0.9 : 150,
         height: 50,
         decoration: BoxDecoration(
-          border: Border.all(width: 1, color: Styles.greyColor),
           color: Styles.lightGreyColor,
           borderRadius: const BorderRadius.all(Radius.circular(10)),
-        ),
-        child: Stack(
-          children: [
-            _buildActionsPanel(context),
-            _buildBackButton(context),
-            _buildToggleExpandButton(context)
+          boxShadow: [
+            BoxShadow(
+              color: Styles.greyColor.withOpacity(0.7),
+              spreadRadius: 2,
+              blurRadius: 4,
+              offset: const Offset(2, 4), // changes position of shadow
+            ),
           ],
         ),
+        child: LayoutBuilder(builder: (context, __) {
+          return SizedBox(
+            height: 50,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildBackButton(context),
+                      _buildActionsPanel(context),
+                    ],
+                  ),
+                ),
+                _buildToggleExpandButton(context)
+              ],
+            ),
+          );
+        }),
       ),
     );
   }
 
-  Positioned _buildToggleExpandButton(BuildContext context) {
-    return Positioned(
-      right: 0,
-      top: 0,
-      bottom: 0,
-      child: IconButton(
-        icon: const Icon(MdiIcons.dotsVertical),
-        color: Styles.darkColor,
-        onPressed: () {
-          setState(() {
-            _expanded = !_expanded;
-          });
-        },
-      ),
+  Widget _buildToggleExpandButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(MdiIcons.dotsVertical),
+      color: Styles.darkColor,
+      onPressed: () {
+        setState(() {
+          _expanded = !_expanded;
+        });
+      },
     );
   }
 
-  Positioned _buildBackButton(BuildContext context) {
-    return Positioned(
-      left: 0,
-      top: 0,
-      bottom: 0,
-      child: IconButton(
-        icon: const Icon(Icons.arrow_back_ios),
-        color: Styles.darkColor,
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
+  Widget _buildBackButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back_ios),
+      color: Styles.darkColor,
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
     );
   }
 
-  Container _buildActionsPanel(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      // width: _expanded ? MediaQuery.of(context).size.width * 0.9 : 150,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: !_expanded
-            ? _buildCollapsedActions(context)
-            : _buildExpandedActions(context),
-      ),
+  Widget _buildActionsPanel(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: !_expanded
+          ? _buildCollapsedActions(context)
+          : _buildExpandedActions(context),
     );
   }
 }

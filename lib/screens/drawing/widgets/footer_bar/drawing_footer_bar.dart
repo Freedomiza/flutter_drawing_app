@@ -8,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import 'dart:io' show Platform;
-
 class DrawingFooterBar extends ConsumerStatefulWidget {
-  const DrawingFooterBar({Key? key}) : super(key: key);
+  const DrawingFooterBar({
+    Key? key,
+  }) : super(key: key);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -35,6 +35,7 @@ class _DrawingFooterBarState extends ConsumerState<DrawingFooterBar> {
       VoidCallback? onLongPress}) {
     // if(onLongPress is no)
     return FooterButton(
+        size: 40,
         tooltips: tooltips,
         icon: icon,
         color: tooltips == _currentTools
@@ -390,73 +391,38 @@ class _DrawingFooterBarState extends ConsumerState<DrawingFooterBar> {
 
   @override
   Widget build(BuildContext context) {
-    // PopupMenu.context = context;
-    final List<Widget> stack = [
-      _buildDraggableBottomSheet(),
-    ];
-
-    if (Platform.isIOS) {
-      stack.add(_buildWhiteBlock());
-    }
-    return Stack(children: stack);
-  }
-
-  Positioned _buildWhiteBlock() {
+    final boxDecoration = BoxDecoration(
+        color: Styles.lightGreyColor,
+        borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+        boxShadow: [
+          BoxShadow(
+            color: Styles.greyColor.withOpacity(0.7),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(2, 4), // changes position of shadow
+          ),
+        ],
+        border:
+            Border.all(width: 1, color: Styles.greyColor.withOpacity(0.57)));
+    final buttons = _buildFooterButtons();
     return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-          width: double.infinity, height: 40, color: Styles.lightGreyColor),
-    );
-  }
-
-  DraggableScrollableSheet _buildDraggableBottomSheet() {
-    return DraggableScrollableSheet(
-      minChildSize: 0.1,
-      maxChildSize: 0.22,
-      initialChildSize: 0.12,
-      builder: (context, scrollController) {
-        final boxDecoration = BoxDecoration(
-            color: Styles.lightGreyColor,
-            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-            boxShadow: [
-              BoxShadow(
-                color: Styles.lightGreyColor.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(-2, -4), // changes position of shadow
-              ),
-            ],
-            border: Border.all(
-                width: 1, color: Styles.greyColor.withOpacity(0.57)));
-
-        return Container(
-          decoration: boxDecoration,
-          child: ListView.builder(
-              controller: scrollController,
-              itemCount: 1,
-              itemBuilder: (BuildContext context, int index) {
-                return Stack(
-                  children: [
-                    Container(
-                        width: double.infinity,
-                        // color: Theme.of(context).primaryColor,
-                        padding: const EdgeInsets.fromLTRB(10, 15, 10, 5),
-                        // alignment: Alignment.le,
-                        child: Wrap(
-                          alignment: WrapAlignment.start,
-                          spacing: 10.0,
-                          runSpacing: 20.0,
-                          direction: Axis.horizontal,
-                          children: _buildFooterButtons(),
-                        )),
-                    buildDragableIcon(context),
-                  ],
-                );
-              }),
-        );
-      },
+      bottom: MediaQuery.of(context).viewInsets.bottom +
+          MediaQuery.of(context).padding.bottom,
+      left: 10,
+      right: 10,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+              height: 50,
+              decoration: boxDecoration,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: buttons.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return buttons[index];
+                  }));
+        },
+      ),
     );
   }
 

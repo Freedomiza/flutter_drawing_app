@@ -56,6 +56,7 @@ dependencies:
   go_router: ^3.0.4
   json_annotation:
   material_design_icons_flutter: ^5.0.6595
+  flutter_floating_bottom_bar: ^1.0.0+1
 
 dev_dependencies:
   flutter_test:

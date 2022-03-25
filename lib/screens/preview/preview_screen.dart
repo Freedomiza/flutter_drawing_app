@@ -23,8 +23,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const boxDecoration = BoxDecoration(
-      boxShadow: [BoxShadow(color: Styles.greyColor)],
+    final boxDecoration = BoxDecoration(
+      color: Styles.greyColor.withOpacity(0.66),
     );
     return Scaffold(
       appBar: AppBar(
@@ -33,18 +33,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
       ),
       body: Container(
         decoration: boxDecoration,
-        child: Center(
-            child: Container(
-                decoration: boxDecoration.copyWith(
-                  boxShadow: [
-                    BoxShadow(
-                      offset: const Offset(4, 4),
-                      spreadRadius: 4,
-                      color: Styles.lightColor.withOpacity(.5),
-                    )
-                  ],
-                ),
-                child: _buildPreviewPicture(context))),
+        child: Center(child: Container(child: _buildPreviewPicture(context))),
       ),
     );
   }
