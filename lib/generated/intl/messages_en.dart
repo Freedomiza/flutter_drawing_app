@@ -25,6 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "APP_NAME": MessageLookupByLibrary.simpleMessage("Drawing app"),
         "DRAWING_SCREEN":
             MessageLookupByLibrary.simpleMessage("Drawing screen"),
-        "NEW_DRAWING": MessageLookupByLibrary.simpleMessage("New drawing")
+        "NEW_DRAWING": MessageLookupByLibrary.simpleMessage("New drawing"),
+        "VIEW_CANVAS": MessageLookupByLibrary.simpleMessage("View canvas")
       };
 }

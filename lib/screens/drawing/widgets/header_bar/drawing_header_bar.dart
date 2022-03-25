@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:drawer_app/resources/styles.dart';
 import 'package:drawer_app/screens/preview/preview_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:drawer_app/screens/drawing/providers/painter_provider.dart';
@@ -31,11 +32,15 @@ class _DrawingHeaderBarState extends ConsumerState<DrawingHeaderBar> {
           icon: const Icon(MdiIcons.eye),
           onPressed: () async {
             Uint8List bytes = await controller.exportAsPNGBytes();
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (BuildContext context) {
-              return PreviewScreen(
-                  bytes: bytes, pathHistory: controller.pathHistory);
-            }));
+            context.goNamed(PreviewScreen.routeName, extra: {
+              "bytes": bytes,
+              "pathHistory": controller.pathHistory,
+            });
+            // Navigator.of(context)
+            //     .push(MaterialPageRoute(builder: (BuildContext context) {
+            //   return PreviewScreen(
+            //       bytes: bytes, pathHistory: controller.pathHistory);
+            // }));
           }),
       // IconButton(
       //   icon: Icon(MdiIcons.dotsVertical),
@@ -85,9 +90,7 @@ class _DrawingHeaderBarState extends ConsumerState<DrawingHeaderBar> {
           onPressed: controller.canRedo
               ? () {
                   if (controller.canRedo) {
-                    setState(() {
-                      controller.redo();
-                    });
+                    controller.redo();
                   }
                 }
               : null,
@@ -123,7 +126,7 @@ class _DrawingHeaderBarState extends ConsumerState<DrawingHeaderBar> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 5,
+      top: MediaQuery.of(context).padding.top,
       right: MediaQuery.of(context).size.width * 0.05,
       child: AnimatedContainer(
         curve: Curves.easeInOutCubic,

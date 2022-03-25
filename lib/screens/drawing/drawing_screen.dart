@@ -1,6 +1,4 @@
-import 'package:drawer_app/generated/l10n.dart';
 import 'package:drawer_app/resources/draw_const.dart';
-
 import 'package:drawer_app/screens/drawing/providers/frame_provider.dart';
 import 'package:drawer_app/screens/drawing/widgets/footer_bar/drawing_footer_bar.dart';
 import 'package:drawer_app/screens/drawing/widgets/header_bar/drawing_header_bar.dart';
@@ -11,7 +9,7 @@ import './widgets/painter/drawing_tool.dart';
 
 class DrawingScreen extends ConsumerStatefulWidget {
   static String routeName = 'drawing';
-  static String routeUrl = '/drawing';
+  static String routeUrl = 'drawing';
   const DrawingScreen({Key? key}) : super(key: key);
 
   @override
@@ -32,9 +30,6 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
     final provider = ref.watch(frameProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).DRAWING_SCREEN),
-      ),
       body: Stack(
         children: [
           Container(

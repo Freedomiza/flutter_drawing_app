@@ -15,8 +15,6 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final counter = ref.watch(counterProvider);
-    // final counterNotifier = ref.read(counterProvider.notifier);
     SizeConfig.init(context);
     return Scaffold(
       appBar: AppBar(

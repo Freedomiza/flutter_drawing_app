@@ -79,6 +79,16 @@ class S {
       args: [],
     );
   }
+
+  /// `View canvas`
+  String get VIEW_CANVAS {
+    return Intl.message(
+      'View canvas',
+      name: 'VIEW_CANVAS',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
