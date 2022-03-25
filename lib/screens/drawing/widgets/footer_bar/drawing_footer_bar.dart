@@ -355,7 +355,7 @@ class _DrawingFooterBarState extends ConsumerState<DrawingFooterBar> {
                         Navigator.of(context).pop();
                       },
                     ),
-                    TextButton(
+                    ElevatedButton(
                       child: const Text('Yes'),
                       onPressed: () {
                         controller.clear();

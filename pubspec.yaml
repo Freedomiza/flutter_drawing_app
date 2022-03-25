@@ -57,6 +57,8 @@ dependencies:
   json_annotation:
   material_design_icons_flutter: ^5.0.6595
   flutter_floating_bottom_bar: ^1.0.0+1
+  image_gallery_saver: ^1.7.1
+  permission_handler: ^9.2.0
 
 dev_dependencies:
   flutter_test:

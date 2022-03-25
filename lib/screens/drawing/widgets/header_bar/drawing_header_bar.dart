@@ -99,16 +99,22 @@ class _DrawingHeaderBarState extends ConsumerState<DrawingHeaderBar> {
             icon: const Icon(MdiIcons.eye),
             onPressed: () async {
               Uint8List bytes = await controller.exportAsPNGBytes();
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (BuildContext context) {
-                return PreviewScreen(
-                    bytes: bytes, pathHistory: controller.pathHistory);
-              }));
+              context.goNamed(PreviewScreen.routeName, extra: {
+                "bytes": bytes,
+                "pathHistory": controller.pathHistory,
+              });
             }),
         IconButton(
             icon: const Icon(MdiIcons.contentSave),
             onPressed: () async {
               Uint8List bytes = await controller.exportAsPNGBytes();
+
+              context.goNamed(PreviewScreen.routeName, extra: {
+                "bytes": bytes,
+                "pathHistory": controller.pathHistory,
+                "requestSave": true
+              });
+
               // TODO: add save method
               // BlocProvider.of<DrawingCubit>(context).addFrame(
               //     bytes: bytes,
